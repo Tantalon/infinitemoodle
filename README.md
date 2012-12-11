@@ -1,6 +1,7 @@
 Infinite Rooms for Moodle
 ==============
 
-This is the Infinite rooms plugin for Moodle.
-To install, copy to <moodle>/reports/infiniterooms
+This is the Infinite Rooms plugin for Moodle.
+
+To install, copy to [moodle home]/reports/infiniterooms
 
