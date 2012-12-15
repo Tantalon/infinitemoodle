@@ -4,7 +4,7 @@
  * A remote call to the Infinite Rooms API, using a cilent-side certificate for authentication.
  */
 function report_infiniterooms_remote($method, $url, $payload = null) {
-	$report_infiniterooms_url = 'https://localhost/infiniterooms';
+	$report_infiniterooms_url = 'https://localhost/infiniterooms/api';
 	$url = $report_infiniterooms_url . '/' . $url;
 
 	$creds = report_infiniterooms_get_credentials();
@@ -12,15 +12,15 @@ function report_infiniterooms_remote($method, $url, $payload = null) {
 	file_put_contents($creds_file, $creds);
 
 	$ch = curl_init($url);
-	//curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
-	//curl_setopt($ch, CURLOPT_HEADER, TRUE);
+	#curl_setopt($ch, CURLOPT_VERBOSE, TRUE);
+	#curl_setopt($ch, CURLOPT_HEADER, TRUE);
 	curl_setopt($ch, CURLOPT_SSLCERT, $creds_file);
 	curl_setopt($ch, CURLOPT_SSLKEY, $creds_file);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-	//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
-	//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+	#curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, TRUE);
+	#curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_FAILONERROR, TRUE);
+	#curl_setopt($ch, CURLOPT_FAILONERROR, TRUE);
 	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 	curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
 	
@@ -34,7 +34,7 @@ function report_infiniterooms_remote($method, $url, $payload = null) {
 	}
 
 	$result = curl_exec($ch);
-	if ($result === FALSE) die("Remote call failed: " . curl_error($ch));
+	if ($result === FALSE) die("Remote call to $url failed: " . curl_error($ch));
 
 	curl_close($ch);
 	unlink($creds_file);
@@ -97,7 +97,7 @@ function report_infiniterooms_create_credentials() {
 }
 
 function report_infiniterooms_get_last_sync() {
-	$last_entry = report_infiniterooms_remote('GET', 'log-last-entry.php');
+	$last_entry = report_infiniterooms_remote('GET', 'log/last-modified.php');
 	if (!is_numeric($last_entry)) {
 		$last_entry = 0;
 	}
@@ -115,7 +115,7 @@ function report_infiniterooms_get_last_sync() {
 function report_infiniterooms_cron() {
 	$last_time = report_infiniterooms_get_last_sync();
 
-	report_infiniterooms_send(
+	print report_infiniterooms_send(
 		'log',
 		'SELECT id, time, userid, ip, course, module, cmid, action, url, info FROM {log} WHERE time >= ?',
 		array($last_time));
@@ -160,7 +160,7 @@ function report_infiniterooms_send($type, $query, $params) {
 
 	// send the data
 	rewind($buffer);
-	report_infiniterooms_remote('PUT', 'log-upload.php', $buffer);
+	print report_infiniterooms_remote('PUT', 'log/upload', $buffer);
 	fclose($buffer);
 }
 
