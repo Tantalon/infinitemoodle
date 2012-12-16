@@ -115,7 +115,7 @@ function report_infiniterooms_get_last_sync() {
 function report_infiniterooms_cron() {
 	$last_time = report_infiniterooms_get_last_sync();
 
-	print report_infiniterooms_send(
+	report_infiniterooms_send(
 		'log',
 		'SELECT id, time, userid, ip, course, module, cmid, action, url, info FROM {log} WHERE time >= ?',
 		array($last_time));
@@ -160,7 +160,7 @@ function report_infiniterooms_send($type, $query, $params) {
 
 	// send the data
 	rewind($buffer);
-	print report_infiniterooms_remote('PUT', 'log/upload', $buffer);
+	print report_infiniterooms_remote('PUT', "moodle/$type", $buffer);
 	fclose($buffer);
 }
 
