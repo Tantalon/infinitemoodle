@@ -116,6 +116,23 @@ function report_infiniterooms_cron() {
 	$last_time = report_infiniterooms_get_last_sync();
 
 	report_infiniterooms_send(
+		'user',
+		'SELECT id, username, idnumber, firstname, lastname, institution, department FROM {user}',
+		array());
+
+/*
+	report_infiniterooms_send(
+		'module',
+		'SELECT id, name FROM {module}',
+		array());
+*/
+
+	report_infiniterooms_send(
+		'course',
+		'SELECT id, fullname, shortname, idnumber, startdate, visible FROM {course}',
+		array());
+
+	report_infiniterooms_send(
 		'log',
 		'SELECT id, time, userid, ip, course, module, cmid, action, url, info FROM {log} WHERE time >= ?',
 		array($last_time));
