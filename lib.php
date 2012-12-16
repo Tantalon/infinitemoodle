@@ -97,7 +97,7 @@ function report_infiniterooms_create_credentials() {
 }
 
 function report_infiniterooms_get_last_sync() {
-	$last_entry = report_infiniterooms_remote('GET', 'log/last-modified.php');
+	$last_entry = report_infiniterooms_remote('GET', 'moodle/last-modified');
 	if (!is_numeric($last_entry)) {
 		$last_entry = 0;
 	}
