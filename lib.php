@@ -44,15 +44,18 @@ function report_infiniterooms_remote($method, $url, $payload = null) {
 
 function report_infiniterooms_get_credentials() {
 	$creds = get_config('report_infiniterooms', 'credentials');
-	if (empty($creds)) $creds = report_infiniterooms_create_credentials();
+	if (empty($creds)) {
+		$creds = report_infiniterooms_create_credentials();
+		set_config('credentials', $creds, 'report_infiniterooms');
+	}
 	return $creds;
 }
 
-function report_infiniterooms_create_credentials() {
+function report_infiniterooms_create_credentials($cn = NULL) {
 	global $CFG, $SITE;
 
 	# find an approperiate common name
-	$cn = $SITE->fullname;
+	if (empty($cn)) $cn = $SITE->fullname;
 	if (empty($cn)) $cn = $SITE->shortname;
 	if (empty($cn)) $cn = php_uname('n');
 
@@ -90,9 +93,8 @@ function report_infiniterooms_create_credentials() {
 	#print "publickey: $publickey\n";
 	#print "privatekey: $privatekey\n";
 
-	// save certificate and private key
+	// return certificate and private key
 	$creds = $publickey . $privatekey;
-	set_config('credentials', $creds, 'report_infiniterooms');
 	return $creds;
 }
 
