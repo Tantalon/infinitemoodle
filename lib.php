@@ -133,17 +133,31 @@ function report_infiniterooms_cron() {
 
 	report_infiniterooms_send(
 		"import/user",
-		"SELECT id as sysid, username, concat_ws(' ', firstname, lastname) as name FROM {user} WHERE timemodified >= ?",
+		"SELECT id as sysid,
+			username,
+			concat_ws(' ', firstname, lastname) as name
+			FROM {user}
+			WHERE timemodified >= ?",
 		array($last_time));
 
 	report_infiniterooms_send(
 		"import/module",
-		"SELECT concat('course_', id) as sysid, nullif(idnumber, '#N/A') as idnumber, fullname as name FROM {course} WHERE timemodified >= ?",
+		"SELECT concat('course_', 0) as sysid,
+			nullif(idnumber, '#N/A') as idnumber,
+			fullname as name
+			FROM {course}
+			WHERE timemodified >= ?",
 		array($last_time));
 
 	report_infiniterooms_send(
 		"import/action",
-		"SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time, action, userid as user, concat('course_', course) as module FROM {log} WHERE time >= ?",
+		"SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time,
+			action,
+			nullif(userid, 0) as user,
+			concat('course_', nullif(course, 0) as module
+			FROM {log}
+			WHERE time >= ?
+			LIMIT 10000",
 		array($last_time));
 
 	return TRUE;
@@ -156,10 +170,8 @@ function report_infiniterooms_send($target, $query, $params) {
 	$buffer = fopen('php://temp', 'w+b');
 	//stream_filter_append($buffer, "zlib.deflate", STREAM_FILTER_WRITE);
 
-	$limitfrom = 0;
-	$limitnum = 100;
 	$fields = null;
-	$rs = $DB->get_recordset_sql($query, $params, $limitfrom, $limitnum);
+	$rs = $DB->get_recordset_sql($query, $params);
 	foreach ($rs as $record) {
 		if (is_null($fields)) {
 			$fields = array_keys(get_object_vars($record));
