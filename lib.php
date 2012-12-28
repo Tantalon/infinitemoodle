@@ -99,11 +99,25 @@ function report_infiniterooms_create_credentials($cn = NULL) {
 }
 
 function report_infiniterooms_get_last_sync() {
-	$last_entry = report_infiniterooms_remote('GET', 'moodle/last-modified');
-	if (!is_numeric($last_entry)) {
-		$last_entry = 0;
+	$last_entry_unixtime = 0;
+	$last_entry_rfc3339 = report_infiniterooms_remote('GET', 'import/last-updated');
+	if (!empty($last_entry_rfc3339)) {
+		$last_entry_datetime = DateTime::createFromFormat(DateTime::RFC3339, $last_entry_rfc3339, new DateTimeZone('UTC'));
+		$last_entry_unixtime = $last_entry_datetime->getTimestamp();
 	}
-	return $last_entry;
+	return $last_entry_unixtime;
+}
+
+function convert_date($format_in, $format_out, $datetime_in) {
+        $utc = new DateTimeZone('UTC');
+        $datetime = DateTime::createFromFormat($format_in, $datetime_in, $utc);
+        if (!$datetime) {
+                $errors = DateTime::getLastErrors();
+                header('HTTP/1. 400 Bad Request');
+                die("Failed to parse date $datetime_in as " . $format_in . " due to " . $errors['errors'][0]);
+        }
+        $datetime->setTimezone($utc);
+        return $datetime->format($format_out);
 }
 
 /**
@@ -118,31 +132,24 @@ function report_infiniterooms_cron() {
 	$last_time = report_infiniterooms_get_last_sync();
 
 	report_infiniterooms_send(
-		'user',
-		'SELECT id, username, idnumber, firstname, lastname, institution, department FROM {user}',
-		array());
-
-/*
-	report_infiniterooms_send(
-		'module',
-		'SELECT id, name FROM {module}',
-		array());
-*/
+		"import/user",
+		"SELECT id as sysid, username, concat_ws(' ', firstname, lastname) as name FROM {user} WHERE timemodified >= ?",
+		array($last_time));
 
 	report_infiniterooms_send(
-		'course',
-		'SELECT id, fullname, shortname, idnumber, startdate, visible FROM {course}',
-		array());
+		"import/module",
+		"SELECT concat('course_', id) as sysid, nullif(idnumber, '#N/A') as idnumber, fullname as name FROM {course} WHERE timemodified >= ?",
+		array($last_time));
 
 	report_infiniterooms_send(
-		'log',
-		'SELECT id, time, userid, ip, course, module, cmid, action, url, info FROM {log} WHERE time >= ?',
+		"import/action",
+		"SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time, action, userid as user, concat('course_', course) as module FROM {log} WHERE time >= ?",
 		array($last_time));
 
 	return TRUE;
 }
 
-function report_infiniterooms_send($type, $query, $params) {
+function report_infiniterooms_send($target, $query, $params) {
 	global $DB;
 
 	// Ideally we should be streaming this to reduce memory requirements
@@ -179,7 +186,7 @@ function report_infiniterooms_send($type, $query, $params) {
 
 	// send the data
 	rewind($buffer);
-	print report_infiniterooms_remote('PUT', "moodle/$type", $buffer);
+	print report_infiniterooms_remote('PUT', $target, $buffer);
 	fclose($buffer);
 }
 
