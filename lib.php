@@ -140,6 +140,11 @@ function report_infiniterooms_get_log_done() {
  * @return bool
  */
 function report_infiniterooms_cron() {
+	report_infiniterooms_sync();
+	return TRUE;
+}
+
+function report_infiniterooms_sync($limit = 10000) {
 	$last_time = report_infiniterooms_get_last_sync();
 
 	report_infiniterooms_send(
@@ -168,10 +173,9 @@ function report_infiniterooms_cron() {
 			concat('course_', nullif(course, 0)) as module
 			FROM {log}
 			WHERE time >= ?
-			LIMIT 10000",
+			LIMIT $limit",
 		array($last_time));
 
-	return TRUE;
 }
 
 function report_infiniterooms_send($target, $query, $params) {
