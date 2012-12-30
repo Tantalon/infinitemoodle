@@ -120,6 +120,17 @@ function convert_date($format_in, $format_out, $datetime_in) {
         return $datetime->format($format_out);
 }
 
+function report_infiniterooms_get_log_size() {
+	global $DB;
+	return $DB->count_records('log');
+}
+
+function report_infiniterooms_get_log_done() {
+	global $DB;
+	$server_time = report_infiniterooms_get_last_sync();
+	return $DB->count_records_select('log', 'time <= ?', array($server_time));
+}
+
 /**
  * Function to be run periodically according to the moodle cron
  * This function searches for things that need to be done, such
@@ -154,7 +165,7 @@ function report_infiniterooms_cron() {
 		"SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time,
 			action,
 			nullif(userid, 0) as user,
-			concat('course_', nullif(course, 0) as module
+			concat('course_', nullif(course, 0)) as module
 			FROM {log}
 			WHERE time >= ?
 			LIMIT 10000",
