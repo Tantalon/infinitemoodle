@@ -7,5 +7,6 @@ require_once($CFG->libdir.'/adminlib.php');
 require_once('lib.php');
 
 header('Content-Type: text/plain');
-print report_infiniterooms_remote('GET', 'ping/authenticated');
+$integration = new MoodleInfiniteRoomsIntegration();
+print $integration->authenticated_ping();
 
