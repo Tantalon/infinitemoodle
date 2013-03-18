@@ -12,8 +12,9 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('pluginname', 'report_infiniterooms'));
 
-$log_size = report_infiniterooms_get_log_size();
-$log_done = report_infiniterooms_get_log_done();
+$integration = new MoodleInfiniteRoomsIntegration();
+$log_size = $integration->get_log_size();
+$log_done = $integration->get_log_done();
 $log_ratio = 100.0 * $log_done / $log_size;
 
 ?>

@@ -33,7 +33,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 	public function get_log_done() {
 		global $DB;
-		$server_time = get_last_sync();
+		$server_time = $this->get_last_sync();
 		return $DB->count_records_select('log', 'time <= ?', array($server_time));
 	}
 
