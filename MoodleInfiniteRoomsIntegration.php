@@ -71,7 +71,12 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 	protected function query($query, $params) {
 		global $DB;
-		return $DB->get_recordset_sql($query, $params);
+		$rs = $DB->get_recordset_sql($query, $params);
+		if (!$rs->valid()) {
+			$rs->close();
+			$rs = false;
+		}
+		return $rs;
 	}
 
 }
