@@ -49,7 +49,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 	protected function get_modules($since_time) {
 		return $this->query("
-			SELECT concat('course_', 0) as sysid,
+			SELECT concat('course_', id) as sysid,
 			nullif(idnumber, '#N/A') as idnumber,
 			fullname as name
 			FROM {course}
