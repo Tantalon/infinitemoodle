@@ -18,15 +18,19 @@ abstract class InfiniteRoomsIntegration {
 	 * Main function, extract the data and send it to Infinite Rooms for processing.
 	 */
 	public function sync($limit = 10000) {
+		set_time_limit(300); // increase time limit to 5 minutes
 		$since_time = $this->get_last_sync();
-
 		$this->send("import/user", $this->get_users($since_time));
 		$this->send("import/module", $this->get_modules($since_time));
-		$this->send("import/action", $this->get_actions($since_time, $limit));
+		return $this->send("import/action", $this->get_actions($since_time, $limit));
 	}
 
 	public function sync_full() {
-		$this->sync(PHP_INT_MAX);
+		// this can take a very long time to return
+		$batch_size = 10000;
+		while (sync($batch_size) == $batch_size) {
+			// keep processing
+		}
 	}
 
 	protected function get_site_name() {
@@ -181,11 +185,11 @@ abstract class InfiniteRoomsIntegration {
 	}
 
 	public function send($target, $rs) {
-		if (is_null($rs)) return;
+		if (is_null($rs)) return 0;
 
 		if (empty($rs)) {
 			if (method_exists($rs, 'close')) $rs->close();
-			return;
+			return 0;
 		}
 
 		// Ideally we should be streaming this to reduce memory requirements
@@ -193,8 +197,11 @@ abstract class InfiniteRoomsIntegration {
 		//stream_filter_append($buffer, "zlib.deflate", STREAM_FILTER_WRITE);
 
 		$fields = null;
+		$record_count = 0;
 		foreach ($rs as $record) {
 			$record = (object)$record;
+			$record_count++;
+
 			if (is_null($fields)) {
 				$fields = array_keys(get_object_vars($record));
 				fwrite($buffer, implode(',', $fields));
@@ -222,6 +229,7 @@ abstract class InfiniteRoomsIntegration {
 		rewind($buffer);
 		print $this->remote_call('PUT', $target, $buffer);
 		fclose($buffer);
+		return $record_count;
 	}
 
 }
