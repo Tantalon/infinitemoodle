@@ -91,6 +91,9 @@ abstract class InfiniteRoomsIntegration {
 		$result = curl_exec($ch);
 		if ($result === FALSE) die("Remote call to $url failed: " . curl_error($ch));
 
+		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if ($status != 200) die("Remote call to $url failed with code $status");
+
 		curl_close($ch);
 		unlink($creds_file);
 
