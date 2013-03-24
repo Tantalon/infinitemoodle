@@ -28,7 +28,7 @@ abstract class InfiniteRoomsIntegration {
 	public function sync_full() {
 		// this can take a very long time to return
 		$batch_size = 10000;
-		while (sync($batch_size) == $batch_size) {
+		while ($this->sync($batch_size) == $batch_size) {
 			// keep processing
 		}
 	}
