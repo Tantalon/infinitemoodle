@@ -46,12 +46,21 @@ abstract class InfiniteRoomsIntegration {
 		return $creds;
 	}
 
+	protected function get_infiniterooms_url() {
+		$url = $this->get_config('infiniterooms');
+		if (empty($url)) {
+			$url = 'https://www.infiniterooms.co.uk';
+			$this->set_config('infiniterooms', $url);
+		}
+		return $url;
+	}
+
 	/**
 	 * A remote call to the Infinite Rooms API, using a cilent-side certificate for authentication.
 	 */
 	protected function remote_call($method, $uri, $payload = null) {
-		$url = 'https://localhost/infiniterooms/api';
-		$url = $url . '/' . $uri;
+		$url = $this->get_infiniterooms_url();
+		$url = rtrim($url, '/') . '/api/' . $uri;
 
 		$creds = $this->get_credentials();
 		$creds_file = tempnam(sys_get_temp_dir(), "infiniterooms-cert");
