@@ -12,7 +12,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		set_config($key, $value, 'report_infiniterooms');
 	}
 
-	protected function get_site_name() {
+	public function get_site_name() {
 		global $SITE;
 		$cn = null;
 		if (empty($cn)) $cn = $SITE->fullname;
@@ -21,7 +21,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		return $cn;
 	}
 
-	protected function get_site_contact() {
+	public function get_site_contact() {
 		global $CFG;
 		return $CFG->supportemail;
 	}
@@ -37,7 +37,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		return $DB->count_records_select('log', 'time <= ?', array($server_time));
 	}
 
-	protected function get_users($since_time) {
+	public function get_users($since_time) {
 		return $this->query("
 			SELECT id as sysid,
 			username,
@@ -47,7 +47,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		", array($since_time));
 	}
 
-	protected function get_modules($since_time) {
+	public function get_modules($since_time) {
 		return $this->query("
 			SELECT concat('course_', id) as sysid,
 			nullif(idnumber, '#N/A') as idnumber,
@@ -57,7 +57,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		", array($since_time));
 	}
 
-	protected function get_actions($since_time, $limit) {
+	public function get_actions($since_time, $limit) {
 		return $this->query("
 			SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time,
 			action,
