@@ -41,6 +41,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		return $this->query("
 			SELECT id as sysid,
 			username,
+			nullif(idnumber, '#N/A') as idnumber,
 			concat_ws(' ', firstname, lastname) as name
 			FROM {user}
 			WHERE timemodified >= ?
