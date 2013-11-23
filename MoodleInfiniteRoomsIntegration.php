@@ -58,6 +58,14 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		", array($since_time));
 	}
 
+	public function get_artefacts($since_time) {
+		return $this->query("
+			SELECT concat('module_', id) as sysid,
+			name
+			FROM {module}
+		", array($since_time));
+	}
+
 	public function get_modules($since_time) {
 		return $this->query("
 			SELECT concat('course_', id) as sysid,

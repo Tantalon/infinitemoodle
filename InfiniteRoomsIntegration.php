@@ -12,6 +12,7 @@ abstract class InfiniteRoomsIntegration {
 
 	protected function get_users($since_time) { return null; }
 	protected function get_groups($since_time) { return null; }
+	protected function get_artefacts($since_time) { return null; }
 	protected function get_modules($since_time) { return null; }
 	protected function get_actions($since_time, $limit) { return null; }
 
@@ -23,6 +24,7 @@ abstract class InfiniteRoomsIntegration {
 		$since_time = $this->get_last_sync();
 		$this->send("import/user", $this->get_users($since_time));
 		$this->send("import/group", $this->get_groups($since_time));
+		$this->send("import/artefact", $this->get_artefacts($since_time));
 		$this->send("import/module", $this->get_modules($since_time));
 		return $this->send("import/action", $this->get_actions($since_time, $limit));
 	}
