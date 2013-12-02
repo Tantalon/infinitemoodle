@@ -66,6 +66,21 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 	}
 
 	public function get_modules($since_time) {
+		/*
+		// cache lookup methods
+		$sql = select concat(module, '-', action), mtable, field from mdl_log_display;
+		$lookup = array("$module-$action" => array(mtable, field)); 
+
+		select id, time, userid, ip, course, module, cmid action, url, info
+		from mdl_log
+
+		$log_display = @$lookup["${log->module}-${log.action}"]
+		if($log_display && is_numeric($log->info) {
+		  $display_name = “SELECT $log_display[‘field’] FROM $log_display[‘mtable’] WHERE id = $display_name = mdl_log.info;
+		}else{
+		  $display_name = $log.info
+		}
+		*/
 		return $this->query("
 			SELECT concat('course_', id) as sysid,
 			nullif(idnumber, '#N/A') as idnumber,
