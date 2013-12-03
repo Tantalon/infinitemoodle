@@ -65,29 +65,55 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		");
 	}
 
-	public function get_modules($since_time) {
-		/*
-		// cache lookup methods
-		$sql = select concat(module, '-', action), mtable, field from mdl_log_display;
-		$lookup = array("$module-$action" => array(mtable, field)); 
-
-		select id, time, userid, ip, course, module, cmid action, url, info
-		from mdl_log
-
-		$log_display = @$lookup["${log->module}-${log.action}"]
-		if($log_display && is_numeric($log->info) {
-		  $display_name = “SELECT $log_display[‘field’] FROM $log_display[‘mtable’] WHERE id = $display_name = mdl_log.info;
-		}else{
-		  $display_name = $log.info
+	private function get_log_display() {
+		$log_display_rs = $this->query("
+				SELECT concat(module, '-', action) key,
+				mtable, field
+				FROM {log_display}
+		");
+		
+		$log_display = array();
+		foreach ($log_display_rs as $row) {
+			$key = $row['key'];
+			$log_display[$key] = array(
+				'mtable' => $row['mtable'],
+				'field' => $row['field']);
 		}
-		*/
-		return $this->query("
-			SELECT concat('course_', id) as sysid,
-			nullif(idnumber, '#N/A') as idnumber,
-			fullname as name
-			FROM {course}
-			WHERE timemodified >= ?
+		return $log_display;
+	}
+
+	public function get_modules($since_time) {
+		global $DB;
+		
+		$log_display_lookup = $this->get_log_display();
+
+		$rs = $this->query("
+			SELECT cmid as sysid,
+				module as artefact,
+				concat(module, '-', action) display_key,
+				info
+			FROM {log}
+			WHERE time >= ?
 		", array($since_time));
+		
+		foreach($rs as &$row) {
+			$display_key = $row['display_key'];
+			$info = $row['info'];
+			
+			$log_display = @$log_display_lookup[$display_key]
+			$display_name = $info;
+			if($log_display && is_numeric($info)) {
+				$display_name = $DB->get_field(
+					$log_display[‘mtable’], $log_display[‘field’],
+					array('id' => $info));
+			}
+			$row['name'] = $display_name;
+			
+			unset($row['info']);
+			unset($row['display_key']);
+		}
+
+		return $rs;
 	}
 
 	public function get_actions($since_time, $limit) {
