@@ -67,14 +67,14 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 	private function get_log_display() {
 		$log_display_rs = $this->query("
-				SELECT concat(module, '-', action) key,
+				SELECT concat(module, '-', action) display_key,
 				mtable, field
 				FROM {log_display}
 		");
 		
 		$log_display = array();
 		foreach ($log_display_rs as $row) {
-			$key = $row['key'];
+			$key = $row['display_key'];
 			$log_display[$key] = array(
 				'mtable' => $row['mtable'],
 				'field' => $row['field']);
