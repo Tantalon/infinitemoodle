@@ -74,10 +74,10 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		
 		$log_display = array();
 		foreach ($log_display_rs as $row) {
-			$key = $row['display_key'];
+			$key = $row->display_key;
 			$log_display[$key] = array(
-				'mtable' => $row['mtable'],
-				'field' => $row['field']);
+				'mtable' => $row->mtable,
+				'field' => $row->field);
 		}
 		return $log_display;
 	}
@@ -128,7 +128,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		", array($since_time));
 	}
 
-	protected function query($query, $params) {
+	protected function query($query, $params = array()) {
 		global $DB;
 		$rs = $DB->get_recordset_sql($query, $params);
 		if (!$rs->valid()) {
