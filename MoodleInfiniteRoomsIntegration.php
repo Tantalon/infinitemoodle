@@ -61,7 +61,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 	public function get_artefacts($since_time) {
 		return $this->query("
 			SELECT name
-			FROM {module}
+			FROM {modules}
 		");
 	}
 
