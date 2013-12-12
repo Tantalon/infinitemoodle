@@ -75,7 +75,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		$log_display = array();
 		foreach ($log_display_rs as $row) {
 			$key = $row->display_key;
-			$log_display[$key] = array(
+			$log_display[$key] = (object) array(
 				'mtable' => $row->mtable,
 				'field' => $row->field);
 		}
@@ -96,24 +96,28 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			WHERE time >= ?
 		", array($since_time));
 		
-		foreach($rs as &$row) {
-			$display_key = $row['display_key'];
-			$info = $row['info'];
+		$myrs = array();
+		foreach($rs as $row) {
+			$display_key = $row->display_key;
+			$info = $row->info;
 			
 			$log_display = @$log_display_lookup[$display_key];
 			$display_name = $info;
 			if($log_display && is_numeric($info)) {
 				$display_name = $DB->get_field(
-					$log_display[‘mtable’], $log_display[‘field’],
+					$log_display->mtable,
+					$log_display->field,
 					array('id' => $info));
 			}
-			$row['name'] = $display_name;
 			
-			unset($row['info']);
-			unset($row['display_key']);
+			$myrs[] = (object) array(
+				'sysid' => $row->sysid,
+				'artefact' => $row->artefact,
+				'name' => $display_name
+			);
 		}
 
-		return $rs;
+		return $myrs;
 	}
 
 	public function get_actions($since_time, $limit) {
