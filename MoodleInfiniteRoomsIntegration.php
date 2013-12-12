@@ -100,7 +100,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			$display_key = $row['display_key'];
 			$info = $row['info'];
 			
-			$log_display = @$log_display_lookup[$display_key]
+			$log_display = @$log_display_lookup[$display_key];
 			$display_name = $info;
 			if($log_display && is_numeric($info)) {
 				$display_name = $DB->get_field(
