@@ -1,6 +1,7 @@
 <?php
 
 require_once('InfiniteRoomsIntegration.php');
+require_once('lib/CallbackMappingIterator.php');
 
 class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
@@ -96,8 +97,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			WHERE time >= ?
 		", array($since_time));
 		
-		$myrs = array();
-		foreach($rs as $row) {
+		return new CallbackMappingIterator($rs, function($key, $row) {
 			$display_key = $row->display_key;
 			$info = $row->info;
 			
@@ -110,14 +110,12 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 					array('id' => $info));
 			}
 			
-			$myrs[] = (object) array(
+			return (object) array(
 				'sysid' => $row->sysid,
 				'artefact' => $row->artefact,
 				'name' => $display_name
 			);
-		}
-
-		return $myrs;
+		});
 	}
 
 	public function get_actions($since_time, $limit) {
