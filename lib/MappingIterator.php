@@ -11,6 +11,11 @@ abstract class MappingIterator extends IteratorIterator {
 	public function current() {
 		return $this->map(parent::key(), parent::current());
 	}
+	
+	public function close() {
+		$iterator = parent::getInnerIterator();
+		if (method_exists($iterator, 'close')) $iterator->close();
+	}
 
 }
 

@@ -88,6 +88,29 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		
 		$log_display_lookup = $this->get_log_display();
 
+/*
+-- this is what I've been using based on the spec, but the granularity appears off
+SELECT cmid as sysid,
+        module as artefact,
+        concat(module, '-', action) display_key,
+        info
+FROM mdl_log;
+
+-- this appears to be the list of course modules
+SELECT cm.id as sysid,
+        m.name as artefact
+FROM mdl_course_modules cm
+INNER JOIN mdl_modules m ON cm.module = m.id;
+
+-- and course modules with all the actions per module
+SELECT ld.id as sysid,
+        m.name as artefact,
+        ld.action as action
+FROM mdl_course_modules cm
+INNER JOIN mdl_modules m ON cm.module = m.id
+INNER JOIN mdl_log_display ld ON ld.module = m.name;
+*/
+
 		$rs = $this->query("
 			SELECT cmid as sysid,
 				module as artefact,
