@@ -70,7 +70,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		// this can be done more efficiently, but it would compromise portability
 
 		$metadata_rs = $this->query("
-			SELECT cm.id cmid, m.name module, ld.mtable, ld.field
+			SELECT cm.id cmid, cm.instance, m.name module, ld.mtable, ld.field
 			FROM {course_modules} cm
 			INNER JOIN {modules} m ON m.id = cm.module
 			LEFT JOIN {log_display} ld ON ld.module = m.name AND ld.action = 'view'
@@ -82,10 +82,10 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			$name = $DB->get_field(
 				$metadata->mtable ?: $metadata->module,
 				$metadata->field ?: 'name',
-				array('id' => $metadata->cmid));
+				array('id' => $metadata->instance));
 			
 			return (object) array(
-				'sysid' => $metadata->sysid,
+				'sysid' => $metadata->cmid,
 				'name' => $name
 			);
 		});
