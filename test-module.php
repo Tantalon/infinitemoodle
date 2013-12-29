@@ -8,6 +8,6 @@ header('Content-Type: text/plain');
 $integration = new MoodleInfiniteRoomsIntegration();
 $modules = $integration->get_modules(0);
 foreach($modules as $module) {
-	print_r($module);
+	print "$module->sysid,$module->name\n";
 }
 
