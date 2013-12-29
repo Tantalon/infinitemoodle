@@ -85,7 +85,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 				array('id' => $metadata->cmid));
 			
 			return (object) array(
-				'sysid' => $row->sysid,
+				'sysid' => $metadata->sysid,
 				'name' => $name
 			);
 		});
