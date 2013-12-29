@@ -66,9 +66,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		");
 	}
 
-	public function get_modules($since_time) {
-		global $DB;
-		
+	public function get_modules($since_time) {		
 		// this can be done more efficiently, but it would compromise portability
 
 		$metadata_rs = $this->query("
@@ -79,7 +77,8 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		");
 		
 		return new CallbackMappingIterator($metadata_rs, function($key, $metadata) {
-
+			global $DB;
+			
 			$name = $DB->get_field(
 				$metadata->mtable ?: $metadata->module,
 				$metadata->field ?: 'name',
