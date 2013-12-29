@@ -66,77 +66,28 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		");
 	}
 
-	private function get_log_display() {
-		$log_display_rs = $this->query("
-				SELECT concat(module, '-', action) display_key,
-				mtable, field
-				FROM {log_display}
-		");
-		
-		$log_display = array();
-		foreach ($log_display_rs as $row) {
-			$key = $row->display_key;
-			$log_display[$key] = (object) array(
-				'mtable' => $row->mtable,
-				'field' => $row->field);
-		}
-		return $log_display;
-	}
-
 	public function get_modules($since_time) {
 		global $DB;
 		
-		$log_display_lookup = $this->get_log_display();
+		// this can be done more efficiently, but it would compromise portability
 
-/*
--- this is what I've been using based on the spec, but the granularity appears off
-SELECT cmid as sysid,
-        module as artefact,
-        concat(module, '-', action) display_key,
-        info
-FROM mdl_log;
-
--- this appears to be the list of course modules
-SELECT cm.id as sysid,
-        m.name as artefact
-FROM mdl_course_modules cm
-INNER JOIN mdl_modules m ON cm.module = m.id;
-
--- and course modules with all the actions per module
-SELECT ld.id as sysid,
-        m.name as artefact,
-        ld.action as action
-FROM mdl_course_modules cm
-INNER JOIN mdl_modules m ON cm.module = m.id
-INNER JOIN mdl_log_display ld ON ld.module = m.name;
-*/
-
-		$rs = $this->query("
-			SELECT cmid as sysid,
-				module as artefact,
-				concat(module, '-', action) display_key,
-				info
-			FROM {log}
-			WHERE time >= ?
-		", array($since_time));
+		$metadata_rs = $this->query("
+			SELECT cm.id cmid, m.name module, ld.mtable, ld.field
+			FROM {course_modules} cm
+			INNER JOIN {modules} m ON m.id = cm.module
+			LEFT JOIN {log_display} ld ON ld.module = m.name AND ld.action = 'view'
+		");
 		
-		return new CallbackMappingIterator($rs, function($key, $row) {
-			$display_key = $row->display_key;
-			$info = $row->info;
-			
-			$log_display = @$log_display_lookup[$display_key];
-			$display_name = $info;
-			if($log_display && is_numeric($info)) {
-				$display_name = $DB->get_field(
-					$log_display->mtable,
-					$log_display->field,
-					array('id' => $info));
-			}
+		return new CallbackMappingIterator($metadata_rs, function($key, $metadata) {
+
+			$name = $DB->get_field(
+				$metadata->mtable ?: $metadata->module,
+				$metadata->field ?: 'name',
+				array('id' => $metadata->cmid));
 			
 			return (object) array(
 				'sysid' => $row->sysid,
-				'artefact' => $row->artefact,
-				'name' => $display_name
+				'name' => $name
 			);
 		});
 	}
