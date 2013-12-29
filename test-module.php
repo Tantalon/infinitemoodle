@@ -7,5 +7,7 @@ require_once('lib.php');
 header('Content-Type: text/plain');
 $integration = new MoodleInfiniteRoomsIntegration();
 $modules = $integration->get_modules(0);
-print_r($modules);
+foreach($modules as $module) {
+	print_r($module);
+}
 
