@@ -100,7 +100,7 @@ abstract class InfiniteRoomsIntegration {
 		if ($result === FALSE) die("Remote call to $url failed: " . curl_error($ch));
 
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if ($status != 200) die("Remote call to $url failed with code $status");
+		if ($status != 200) die("Remote call to $url failed with code $status\n$result");
 
 		curl_close($ch);
 		unlink($creds_file);
@@ -222,18 +222,22 @@ abstract class InfiniteRoomsIntegration {
 		if (method_exists($rs, 'close')) $rs->close();
 
 		// print out csv for debugging
-		/*
-		rewind($buffer);
-		$out = fopen('php://output', 'w+b');
-		stream_copy_to_stream($buffer, $out);
-		fclose($out);
-		*/
+		if ($this->debug()) {
+			rewind($buffer);
+			$out = fopen('php://output', 'w+b');
+			stream_copy_to_stream($buffer, $out);
+			fclose($out);
+		}
 
 		// send the data
 		rewind($buffer);
 		print $this->remote_call('PUT', $target, $buffer);
 		fclose($buffer);
 		return $record_count;
+	}
+	
+	protected function debug() {
+		return @$_GET['debug'];
 	}
 
 }
