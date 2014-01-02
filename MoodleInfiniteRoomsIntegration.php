@@ -96,6 +96,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time,
 			action,
 			nullif(userid, 0) as user,
+			ip as user_ip,
 			concat('course_', nullif(course, 0)) as module
 			FROM {log}
 			WHERE time >= ?
