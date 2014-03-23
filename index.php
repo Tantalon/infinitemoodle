@@ -19,6 +19,11 @@ $log_ratio = 100.0 * $log_done / $log_size;
 
 ?>
 
+Registration
+<div>
+<label>Access key</label>
+</div>
+
 Analytics coverage
 <div class="progress">
 <div id="infiniterooms_progress_bar"></div>

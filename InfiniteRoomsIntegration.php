@@ -10,6 +10,7 @@ abstract class InfiniteRoomsIntegration {
 	protected abstract function get_config($key);
 	protected abstract function set_config($key, $value);
 
+	protected function get_access_key() { return null; }
 	protected function get_users($since_time) { return null; }
 	protected function get_groups($since_time) { return null; }
 	protected function get_artefacts($since_time) { return null; }
@@ -21,6 +22,7 @@ abstract class InfiniteRoomsIntegration {
 	 */
 	public function sync($limit = 10000) {
 		set_time_limit(300); // increase time limit to 5 minutes
+		$this->update_details();
 		$since_time = $this->get_last_sync();
 		$this->send("import/user", $this->get_users($since_time));
 		$this->send("import/group", $this->get_groups($since_time));
@@ -35,6 +37,15 @@ abstract class InfiniteRoomsIntegration {
 		while ($this->sync($batch_size) == $batch_size) {
 			// keep processing
 		}
+	}
+
+	public function update_details() {
+		$access_key = $this->get_access_key();
+		if (empty($access_key)) throw new Exception("Customer access key not setup");
+
+		$this->remote_call('GET', 'app', array(
+			'access_key' => $access_key
+		));
 	}
 
 	protected function get_site_name() {
@@ -94,6 +105,15 @@ abstract class InfiniteRoomsIntegration {
 			curl_setopt($ch, CURLOPT_READFUNCTION, function($ch, $fd, $length) use ($payload) {
 			    return fread($payload, $length) ?: '';
 			});
+		} else if ($method == 'POST') {
+			$payload_encoded = '';
+			foreach($_POST as $name => $value) {
+				$payload_encoded .= urlencode($name) . '=' . urlencode($value) . '&';
+			}
+			$payload_encoded = substr($payload_encoded, 0, strlen($payload_encoded)-1);
+
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,  $payload_encoded);
 		}
 
 		$result = curl_exec($ch);

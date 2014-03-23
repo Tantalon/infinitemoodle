@@ -13,6 +13,10 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		set_config($key, $value, 'report_infiniterooms');
 	}
 
+	protected function get_access_key() {
+		return get_config('report_infiniterooms_accesskey');
+	}
+
 	public function get_site_name() {
 		global $SITE;
 		$cn = null;
