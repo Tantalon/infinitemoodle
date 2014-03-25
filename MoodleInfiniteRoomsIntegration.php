@@ -14,7 +14,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 	}
 
 	protected function get_access_key() {
-		return get_config('report_infiniterooms_accesskey');
+		return get_config(null, 'report_infiniterooms_accesskey');
 	}
 
 	public function get_site_name() {

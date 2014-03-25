@@ -43,8 +43,8 @@ abstract class InfiniteRoomsIntegration {
 		$access_key = $this->get_access_key();
 		if (empty($access_key)) throw new Exception("Customer access key not setup");
 
-		$this->remote_call('GET', 'app', array(
-			'access_key' => $access_key
+		$this->remote_call('POST', 'app', array(
+			'accesskey' => $access_key
 		));
 	}
 
@@ -107,7 +107,7 @@ abstract class InfiniteRoomsIntegration {
 			});
 		} else if ($method == 'POST') {
 			$payload_encoded = '';
-			foreach($_POST as $name => $value) {
+			foreach($payload as $name => $value) {
 				$payload_encoded .= urlencode($name) . '=' . urlencode($value) . '&';
 			}
 			$payload_encoded = substr($payload_encoded, 0, strlen($payload_encoded)-1);
@@ -120,7 +120,7 @@ abstract class InfiniteRoomsIntegration {
 		if ($result === FALSE) die("Remote call to $url failed: " . curl_error($ch));
 
 		$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		if ($status != 200) die("Remote call to $url failed with code $status\n$result");
+		if ($status != 200 && $status != 204) die("Remote call to $url failed with code $status\n$result");
 
 		curl_close($ch);
 		unlink($creds_file);
