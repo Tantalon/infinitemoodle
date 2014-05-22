@@ -56,6 +56,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 	public function get_groups($since_time) {
 		return $this->query("
 			SELECT concat('course_', id) as sysid,
+			'1' as type,
 			nullif(idnumber, '#N/A') as idnumber,
 			fullname as name
 			FROM {course}
