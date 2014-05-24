@@ -75,7 +75,8 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		// this can be done more efficiently, but it would compromise portability
 
 		$metadata_rs = $this->query("
-			SELECT cm.id cmid, cm.instance, m.name module, ld.mtable, ld.field
+			SELECT cm.id cmid, cm.instance, m.name module, ld.mtable, ld.field,
+			concat('course_', cm.course) as group
 			FROM {course_modules} cm
 			INNER JOIN {modules} m ON m.id = cm.module
 			LEFT JOIN {log_display} ld ON ld.module = m.name AND ld.action = 'view'
@@ -89,9 +90,12 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 				$metadata->field ?: 'name',
 				array('id' => $metadata->instance));
 			
+			// need group and artefact here!
 			return (object) array(
 				'sysid' => $metadata->cmid,
-				'name' => $name
+				'name' => $name,
+				'artefact' => $metadata->module,
+				'group' => $metadata->group
 			);
 		});
 	}
