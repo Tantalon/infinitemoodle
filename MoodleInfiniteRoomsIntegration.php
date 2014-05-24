@@ -106,6 +106,8 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			action,
 			nullif(userid, 0) as user,
 			ip as user_ip,
+			module as artefact,
+			concat('course_', nullif(course, 0)) as group,
 			concat('course_', nullif(course, 0)) as module
 			FROM {log}
 			WHERE time >= ?
