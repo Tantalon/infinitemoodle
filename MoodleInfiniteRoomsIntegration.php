@@ -109,6 +109,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			module as artefact,
 			concat('course_', nullif(course, 0)) as group,
 			concat('course_', nullif(course, 0)) as module,
+			id as sysid,
 			info as sysinfo
 			FROM {log}
 			WHERE time >= ?
