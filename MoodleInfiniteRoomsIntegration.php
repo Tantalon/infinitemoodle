@@ -76,7 +76,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 		$metadata_rs = $this->query("
 			SELECT cm.id cmid, cm.instance, m.name module, ld.mtable, ld.field,
-			concat('course_', cm.course) as group
+			concat('course_', cm.course) as `group`
 			FROM {course_modules} cm
 			INNER JOIN {modules} m ON m.id = cm.module
 			LEFT JOIN {log_display} ld ON ld.module = m.name AND ld.action = 'view'
@@ -107,7 +107,7 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			nullif(userid, 0) as user,
 			ip as user_ip,
 			module as artefact,
-			concat('course_', nullif(course, 0)) as group,
+			concat('course_', nullif(course, 0)) as `group`,
 			concat('course_', nullif(course, 0)) as module,
 			id as sysid,
 			info as sysinfo
