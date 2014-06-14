@@ -209,6 +209,7 @@ abstract class InfiniteRoomsIntegration {
 	}
 
 	public function send($target, $rs) {
+		if ($this->debug()) echo "\nSending to $target\n";
 		if (is_null($rs)) return 0;
 
 		if (empty($rs)) {
