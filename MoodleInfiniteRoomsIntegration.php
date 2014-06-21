@@ -47,7 +47,8 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			SELECT id as sysid,
 			username,
 			nullif(idnumber, '#N/A') as idnumber,
-			concat_ws(' ', firstname, lastname) as name
+			concat_ws(' ', firstname, lastname) as name,
+			email
 			FROM {user}
 			WHERE timemodified >= ?
 		", array($since_time));
