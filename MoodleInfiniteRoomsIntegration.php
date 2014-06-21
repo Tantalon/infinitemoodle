@@ -103,17 +103,19 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 
 	public function get_actions($since_time, $limit) {
 		return $this->query("
-			SELECT from_unixtime(time, '%Y-%m-%dT%H:%i:%sZ') as time,
-			action,
-			nullif(userid, 0) as user,
-			ip as user_ip,
-			module as artefact,
-			concat('course_', nullif(course, 0)) as `group`,
-			concat('course_', nullif(course, 0)) as module,
-			id as sysid,
-			info as sysinfo
-			FROM {log}
-			WHERE time >= ?
+			SELECT from_unixtime(l.time, '%Y-%m-%dT%H:%i:%sZ') as time,
+			l.action,
+			nullif(l.userid, 0) as user,
+			l.ip as user_ip,
+			l.module as artefact,
+			concat('course_', nullif(l.course, 0)) as `group`,
+			cm.id as module,
+			l.id as sysid,
+			l.info as sysinfo
+			FROM {log} l
+			left join {modules} m on m.name = l.module
+			left join {course_modules} cm on cm.module = m.id
+			WHERE l.time >= ?
 			LIMIT $limit
 		", array($since_time));
 	}
