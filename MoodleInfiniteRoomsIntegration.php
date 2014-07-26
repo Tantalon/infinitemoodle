@@ -54,12 +54,25 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		", array($since_time));
 	}
 	
+	public function get_group_categories($since_time) {
+		return $this->query("
+			select cc.id as sysid,
+			cc.name,
+			cc.idnumber,
+			cc.parent,
+			cc.depth,
+			cc.path
+			from {course_categories} cc
+		");
+	}
+	
 	public function get_groups($since_time) {
 		return $this->query("
 			SELECT concat('course_', id) as sysid,
 			'1' as type,
 			nullif(idnumber, '#N/A') as idnumber,
-			fullname as name
+			fullname as name,
+			category
 			FROM {course}
 			WHERE timemodified >= ?
 		", array($since_time));

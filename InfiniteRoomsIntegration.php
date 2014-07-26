@@ -25,6 +25,7 @@ abstract class InfiniteRoomsIntegration {
 		$this->update_details();
 		$since_time = $this->get_last_sync();
 		$this->send("import/user", $this->get_users($since_time));
+		$this->send("import/group_category", $this->get_group_categories($since_time));
 		$this->send("import/group", $this->get_groups($since_time));
 		$this->send("import/user_group", $this->get_user_groups($since_time));
 		$this->send("import/artefact", $this->get_artefacts($since_time));
