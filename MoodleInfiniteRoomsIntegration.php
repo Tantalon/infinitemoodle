@@ -69,8 +69,8 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 		// warning: this isn't incremental, can we track deletes?
 		return $this->query("
 			SELECT ra.id as sysid,
-			ra.userid as user_id,
-			concat('course_', co.instanceid) as group_id,
+			ra.userid as user,
+			concat('course_', co.instanceid) as group,
 			r.name as role
 			FROM {role_assignments} ra
 			JOIN {role} r ON ra.roleid = r.id
