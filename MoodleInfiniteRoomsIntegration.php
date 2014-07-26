@@ -64,6 +64,19 @@ class MoodleInfiniteRoomsIntegration extends InfiniteRoomsIntegration {
 			WHERE timemodified >= ?
 		", array($since_time));
 	}
+	
+	public function get_user_groups($since_time) {
+		// warning: this isn't incremental, can we track deletes?
+		return $this->query("
+			SELECT ra.id as sysid,
+			ra.userid as user_id,
+			concat('course_', co.instanceid) as group_id,
+			r.name as role
+			FROM {role_assignments} ra
+			JOIN {role} r ON ra.roleid = r.id
+			JOIN {context} co ON ra.contextid = co.id AND co.contextlevel = 50
+		");
+	}
 
 	public function get_artefacts($since_time) {
 		return $this->query("
